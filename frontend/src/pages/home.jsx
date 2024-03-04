@@ -2,38 +2,58 @@ import React, { useState } from "react";
 import mammoth from "mammoth";
 import axios from "axios";
 import { Avatar, Button, Typography } from "@material-tailwind/react";
-import { notification } from "antd";
+import { notification, Select } from "antd";
 import { MyLoader } from "@/widgets/loader";
 
 export function Home() {
   const [loading, setloading] = useState(false);
   const [docText, setDocText] = useState("");
-  const [lessonTitle, setLessonTitle] = useState("");
   const [aiResult, setAIResult] = useState("");
   const [aiImage, setAIImage] = useState("");
-
-  const handleFileChanger = (e) => {
-    const file = event.target.files[0];
-    if (file) {
-      var reader = new FileReader();
-
-      reader.onload = function (event) {
-        var arrayBuffer = event.target.result;
-
-        mammoth
-          .convertToHtml({ arrayBuffer: arrayBuffer })
-          .then(function (result) {
-            setDocText(result.value);
-          })
-          .catch(function (err) {
-            console.log(err);
-          });
-        setLessonTitle(file.name);
-      };
-
-      reader.readAsArrayBuffer(file);
-    }
-  };
+  const filterOption = (input, option) =>
+    (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
+  const lessonlist = [
+    {
+      value: "Lesson1",
+      title: "Lesson1",
+    },
+    {
+      value: "Lesson2",
+      title: "Lesson2",
+    },
+    {
+      value: "Lesson3",
+      title: "Lesson3",
+    },
+    {
+      value: "Lesson4",
+      title: "Lesson4",
+    },
+    {
+      value: "Lesson5",
+      title: "Lesson5",
+    },
+    {
+      value: "Lesson6",
+      title: "Lesson6",
+    },
+    {
+      value: "Lesson7",
+      title: "Lesson7",
+    },
+    {
+      value: "Lesson8",
+      title: "Lesson8",
+    },
+    {
+      value: "Lesson9",
+      title: "Lesson9",
+    },
+    {
+      value: "Lesson10",
+      title: "Lesson10",
+    },
+  ];
 
   const handleSummarize = async () => {
     try {
@@ -45,6 +65,7 @@ export function Home() {
         }
       );
       setAIResult(response.data.data);
+      setAIImage(null);
     } catch (err) {
       notification.warning({ message: "Internal Server Error" });
     } finally {
@@ -62,6 +83,7 @@ export function Home() {
         }
       );
       setAIResult(response.data.data);
+      setAIImage(null);
     } catch (err) {
       notification.warning({ message: "Internal Server Error" });
     } finally {
@@ -79,6 +101,7 @@ export function Home() {
         }
       );
       setAIResult(response.data.data);
+      setAIImage(null);
     } catch (err) {
       notification.warning({ message: "Internal Server Error" });
     } finally {
@@ -113,11 +136,22 @@ export function Home() {
         }
       );
       setAIResult(response.data.data);
+      setAIImage(null);
     } catch (err) {
       notification.warning({ message: "Internal Server Error" });
     } finally {
       setloading(false);
     }
+  };
+
+  const handleSelectLesson = (val) => {
+    let filePath = "/contents/" + val + ".docx";
+    fetch(filePath)
+      .then((response) => response.blob())
+      .then((blob) => blob.arrayBuffer()) // Convert the blob to an ArrayBuffer
+      .then((arrayBuffer) => mammoth.convertToHtml({ arrayBuffer })) // Pass the ArrayBuffer to mammoth
+      .then((result) => setDocText(result.value))
+      .catch((err) => console.log(err));
   };
 
   return (
@@ -130,28 +164,17 @@ export function Home() {
               <Typography variant="h3" className="mr-8 font-normal normal-case">
                 Lesson
               </Typography>
-              <label
-                htmlFor="dropzone-file1"
-                className="flex w-1/2 cursor-pointer flex-col items-center justify-center rounded-lg border-[1px] border-black"
-              >
-                <div className="flex items-center justify-center p-2 text-center">
-                  <Avatar src="/img/upload.svg" className="m-2 h-auto w-5" />
-                  <p className="text-lg font-normal">Upload Lesson file here</p>
-                </div>
-                <input
-                  id="dropzone-file1"
-                  type="file"
-                  accept=".doc,.docx"
-                  onChange={handleFileChanger}
-                  className="hidden"
+              <div className="flex w-1/2 cursor-pointer items-center justify-center rounded-lg">
+                <Select
+                  placeholder="Select a Lesson"
+                  optionFilterProp="children"
+                  onChange={handleSelectLesson}
+                  filterOption={filterOption}
+                  options={lessonlist}
+                  className="h-full w-full"
                 />
-              </label>
-            </div>
-            {lessonTitle && (
-              <div className="w-full border-y-[1px] border-black bg-[#bfbfbf] px-5">
-                {lessonTitle}
               </div>
-            )}
+            </div>
             <div className="w-full bg-white p-5">
               <div
                 dangerouslySetInnerHTML={{
@@ -225,15 +248,18 @@ export function Home() {
               </Button>
             </div>
             <div className="w-full bg-white p-5">
-              {aiImage && <Avatar src={aiImage} className="h-auto w-full" />}
-              <div
-                dangerouslySetInnerHTML={{
-                  __html: aiResult.includes("\n")
-                    ? aiResult.replace(/\n/g, "<br />")
-                    : aiResult,
-                }}
-                className="doc-content text-base text-black"
-              />
+              {aiImage ? (
+                <Avatar src={aiImage} className="h-auto w-full" />
+              ) : (
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: aiResult.includes("\n")
+                      ? aiResult.replace(/\n/g, "<br />")
+                      : aiResult,
+                  }}
+                  className="doc-content text-base text-black"
+                />
+              )}
             </div>
           </div>
         </div>

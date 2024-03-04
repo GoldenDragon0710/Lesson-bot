@@ -8,7 +8,10 @@ const openai = new OpenAI({
 exports.summarize = async (req, res) => {
   const { docText } = req.body;
   let msgs = [
-    { role: "system", content: "Summarize in 2 lines the learner objectives" },
+    {
+      role: "system",
+      content: "....Summarize the learning objectives in 2 short sentences",
+    },
     { role: "user", content: docText },
   ];
   try {
@@ -30,7 +33,8 @@ exports.contentStandard = async (req, res) => {
   let msgs = [
     {
       role: "system",
-      content: "Tell me which content standards relate to reading or writing",
+      content:
+        "...Tell me specifically which content standards relate to reading or writing",
     },
     { role: "user", content: docText },
   ];
@@ -53,7 +57,8 @@ exports.essentialQues = async (req, res) => {
   let msgs = [
     {
       role: "system",
-      content: "Re-write essential questions at 3rd grade reading level",
+      content:
+        "....Re-write the essential questions at 3rd grade reading level",
     },
     { role: "user", content: docText },
   ];
@@ -77,7 +82,7 @@ exports.illustration = async (req, res) => {
     {
       role: "system",
       content:
-        "Please extract the summary key point for an illustration from the learner relevance",
+        "...Please extract the summary key point from learner relevant and produce an illustration of it",
     },
     { role: "user", content: docText },
   ];
@@ -107,7 +112,8 @@ exports.quizQues = async (req, res) => {
   let msgs = [
     {
       role: "system",
-      content: "Expand formative assessments into 10 quiz questions",
+      content:
+        "....Expand the content in the formative assessment section into 10 quiz questions that I can use with my students. It should involve the current questions from the formative assessment section",
     },
     { role: "user", content: docText },
   ];
