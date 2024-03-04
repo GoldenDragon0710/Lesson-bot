@@ -1,0 +1,14 @@
+.doc-content ul,
+.doc-content ol {
+  list-style-type: disc; /* For 'ul', you might use 'disc'. For 'ol', you might use 'decimal'. */
+  margin-left: 20px; /* Adjust as needed to ensure visibility */
+}
+
+.doc-content li {
+  margin-bottom: 3px; /* Optional: Adjust the spacing between list items */
+}
+
+.doc-content p {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
