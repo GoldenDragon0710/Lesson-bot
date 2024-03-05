@@ -6,11 +6,11 @@ const openai = new OpenAI({
 });
 
 exports.summarize = async (req, res) => {
-  const { docText } = req.body;
+  const { docText, title } = req.body;
   let msgs = [
     {
       role: "system",
-      content: "....Summarize the learning objectives in 2 short sentences",
+      content: `For the lesson titled ${title}, summarize the learning objectives in 2 short sentences`,
     },
     { role: "user", content: docText },
   ];
@@ -29,12 +29,11 @@ exports.summarize = async (req, res) => {
 };
 
 exports.contentStandard = async (req, res) => {
-  const { docText } = req.body;
+  const { docText, title } = req.body;
   let msgs = [
     {
       role: "system",
-      content:
-        "...Tell me specifically which content standards relate to reading or writing",
+      content: `For the lesson titled ${title}, tell me specifically which content standards relate to reading or writing`,
     },
     { role: "user", content: docText },
   ];
@@ -53,12 +52,11 @@ exports.contentStandard = async (req, res) => {
 };
 
 exports.essentialQues = async (req, res) => {
-  const { docText } = req.body;
+  const { docText, title } = req.body;
   let msgs = [
     {
       role: "system",
-      content:
-        "....Re-write the essential questions at 3rd grade reading level",
+      content: `For the lesson titled ${title}, re-write the essential questions at 3rd grade reading level`,
     },
     { role: "user", content: docText },
   ];
@@ -77,12 +75,11 @@ exports.essentialQues = async (req, res) => {
 };
 
 exports.illustration = async (req, res) => {
-  const { docText } = req.body;
+  const { docText, title } = req.body;
   let msgs = [
     {
       role: "system",
-      content:
-        "...Please extract the summary key point from learner relevant and produce an illustration of it",
+      content: `For the lesson titled ${title}, please extract the summary key point from learner relevant and produce an illustration of it`,
     },
     { role: "user", content: docText },
   ];
@@ -108,12 +105,11 @@ exports.illustration = async (req, res) => {
 };
 
 exports.quizQues = async (req, res) => {
-  const { docText } = req.body;
+  const { docText, title } = req.body;
   let msgs = [
     {
       role: "system",
-      content:
-        "....Expand the content in the formative assessment section into 10 quiz questions that I can use with my students. It should involve the current questions from the formative assessment section",
+      content: `For the lesson titled ${title}, expand the content in the formative assessment section into 10 quiz questions that I can use with my students. It should involve the current questions from the formative assessment section`,
     },
     { role: "user", content: docText },
   ];

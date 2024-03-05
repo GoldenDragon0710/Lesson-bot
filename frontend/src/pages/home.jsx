@@ -10,6 +10,7 @@ export function Home() {
   const [docText, setDocText] = useState("");
   const [aiResult, setAIResult] = useState("");
   const [aiImage, setAIImage] = useState("");
+  const [title, setTitle] = useState("");
   const filterOption = (input, option) =>
     (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
   const lessonlist = [
@@ -62,6 +63,7 @@ export function Home() {
         `${process.env.REACT_APP_BASED_URL}/summarize`,
         {
           docText: docText,
+          title: title,
         }
       );
       setAIResult(response.data.data);
@@ -80,6 +82,7 @@ export function Home() {
         `${process.env.REACT_APP_BASED_URL}/content_standard`,
         {
           docText: docText,
+          title: title,
         }
       );
       setAIResult(response.data.data);
@@ -98,6 +101,7 @@ export function Home() {
         `${process.env.REACT_APP_BASED_URL}/essential_ques`,
         {
           docText: docText,
+          title: title,
         }
       );
       setAIResult(response.data.data);
@@ -116,6 +120,7 @@ export function Home() {
         `${process.env.REACT_APP_BASED_URL}/illustration`,
         {
           docText: docText,
+          title: title,
         }
       );
       setAIImage(response.data.data);
@@ -133,6 +138,7 @@ export function Home() {
         `${process.env.REACT_APP_BASED_URL}/quiz_ques`,
         {
           docText: docText,
+          title: title,
         }
       );
       setAIResult(response.data.data);
@@ -150,7 +156,19 @@ export function Home() {
       .then((response) => response.blob())
       .then((blob) => blob.arrayBuffer()) // Convert the blob to an ArrayBuffer
       .then((arrayBuffer) => mammoth.convertToHtml({ arrayBuffer })) // Pass the ArrayBuffer to mammoth
-      .then((result) => setDocText(result.value))
+      .then((result) => {
+        setDocText(result.value);
+        const regex = /<p><strong>Lesson Title:(.*?)<\/p>/;
+        const matches = result.value.match(regex);
+
+        // Extract the lesson title from the matches array
+        const str = matches ? matches[1] : null;
+
+        const endTagIndex = str.indexOf("</strong>") + "</strong>".length;
+        const lesson_title = str.substring(endTagIndex).trim();
+
+        setTitle(lesson_title);
+      })
       .catch((err) => console.log(err));
   };
 
