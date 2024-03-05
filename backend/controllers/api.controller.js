@@ -7,6 +7,7 @@ const openai = new OpenAI({
 
 exports.summarize = async (req, res) => {
   const { docText, title } = req.body;
+  console.log(title);
   let msgs = [
     {
       role: "system",
@@ -30,6 +31,7 @@ exports.summarize = async (req, res) => {
 
 exports.contentStandard = async (req, res) => {
   const { docText, title } = req.body;
+  console.log(title);
   let msgs = [
     {
       role: "system",
@@ -53,6 +55,7 @@ exports.contentStandard = async (req, res) => {
 
 exports.essentialQues = async (req, res) => {
   const { docText, title } = req.body;
+  console.log(title);
   let msgs = [
     {
       role: "system",
@@ -76,6 +79,7 @@ exports.essentialQues = async (req, res) => {
 
 exports.illustration = async (req, res) => {
   const { docText, title } = req.body;
+  console.log(title);
   let msgs = [
     {
       role: "system",
@@ -106,6 +110,7 @@ exports.illustration = async (req, res) => {
 
 exports.quizQues = async (req, res) => {
   const { docText, title } = req.body;
+  console.log(title);
   let msgs = [
     {
       role: "system",
