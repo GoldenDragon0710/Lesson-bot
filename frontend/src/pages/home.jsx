@@ -1,69 +1,46 @@
-import React, { useState } from "react";
-import mammoth from "mammoth";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Avatar, Button, Typography } from "@material-tailwind/react";
 import { notification, Select } from "antd";
 import { MyLoader } from "@/widgets/loader";
+import { useNavigate } from "react-router-dom";
 
 export function Home() {
+  const navigate = useNavigate();
   const [loading, setloading] = useState(false);
   const [docText, setDocText] = useState("");
   const [aiResult, setAIResult] = useState("");
   const [aiImage, setAIImage] = useState("");
-  const [title, setTitle] = useState("");
+  const [selectedLessonId, setSelectedLessonId] = useState("");
   const filterOption = (input, option) =>
     (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
-  const lessonlist = [
-    {
-      value: "Lesson1",
-      title: "Lesson1",
-    },
-    {
-      value: "Lesson2",
-      title: "Lesson2",
-    },
-    {
-      value: "Lesson3",
-      title: "Lesson3",
-    },
-    {
-      value: "Lesson4",
-      title: "Lesson4",
-    },
-    {
-      value: "Lesson5",
-      title: "Lesson5",
-    },
-    {
-      value: "Lesson6",
-      title: "Lesson6",
-    },
-    {
-      value: "Lesson7",
-      title: "Lesson7",
-    },
-    {
-      value: "Lesson8",
-      title: "Lesson8",
-    },
-    {
-      value: "Lesson9",
-      title: "Lesson9",
-    },
-    {
-      value: "Lesson10",
-      title: "Lesson10",
-    },
-  ];
+  const [lessonlist, setLessonList] = useState([]);
+
+  useEffect(() => {
+    getLessonList();
+  }, []);
+
+  const getLessonList = async () => {
+    try {
+      setloading(true);
+      const response = await axios.get(
+        `${process.env.REACT_APP_BASED_URL}/dataset/`
+      );
+      setLessonList(response.data.data);
+    } catch (err) {
+      notification.warning({ message: "Internal Server Error" });
+    } finally {
+      setloading(false);
+    }
+  };
 
   const handleSummarize = async () => {
     try {
       setloading(true);
       const response = await axios.post(
-        `${process.env.REACT_APP_BASED_URL}/summarize`,
+        `${process.env.REACT_APP_BASED_URL}/doc/summarize`,
         {
-          docText: docText,
-          title: title,
+          lessonId: selectedLessonId,
         }
       );
       setAIResult(response.data.data);
@@ -79,10 +56,9 @@ export function Home() {
     try {
       setloading(true);
       const response = await axios.post(
-        `${process.env.REACT_APP_BASED_URL}/content_standard`,
+        `${process.env.REACT_APP_BASED_URL}/doc/content_standard`,
         {
-          docText: docText,
-          title: title,
+          lessonId: selectedLessonId,
         }
       );
       setAIResult(response.data.data);
@@ -98,10 +74,9 @@ export function Home() {
     try {
       setloading(true);
       const response = await axios.post(
-        `${process.env.REACT_APP_BASED_URL}/essential_ques`,
+        `${process.env.REACT_APP_BASED_URL}/doc/essential_ques`,
         {
-          docText: docText,
-          title: title,
+          lessonId: selectedLessonId,
         }
       );
       setAIResult(response.data.data);
@@ -117,10 +92,9 @@ export function Home() {
     try {
       setloading(true);
       const response = await axios.post(
-        `${process.env.REACT_APP_BASED_URL}/illustration`,
+        `${process.env.REACT_APP_BASED_URL}/doc/illustration`,
         {
-          docText: docText,
-          title: title,
+          lessonId: selectedLessonId,
         }
       );
       setAIImage(response.data.data);
@@ -135,10 +109,9 @@ export function Home() {
     try {
       setloading(true);
       const response = await axios.post(
-        `${process.env.REACT_APP_BASED_URL}/quiz_ques`,
+        `${process.env.REACT_APP_BASED_URL}/doc/quiz_ques`,
         {
-          docText: docText,
-          title: title,
+          lessonId: selectedLessonId,
         }
       );
       setAIResult(response.data.data);
@@ -151,25 +124,12 @@ export function Home() {
   };
 
   const handleSelectLesson = (val) => {
-    let filePath = "/contents/" + val + ".docx";
-    fetch(filePath)
-      .then((response) => response.blob())
-      .then((blob) => blob.arrayBuffer()) // Convert the blob to an ArrayBuffer
-      .then((arrayBuffer) => mammoth.convertToHtml({ arrayBuffer })) // Pass the ArrayBuffer to mammoth
-      .then((result) => {
-        setDocText(result.value);
-        const regex = /<p><strong>Lesson Title:(.*?)<\/p>/;
-        const matches = result.value.match(regex);
+    setDocText(lessonlist[val].content);
+    setSelectedLessonId(lessonlist[val].lessonId);
+  };
 
-        // Extract the lesson title from the matches array
-        const str = matches ? matches[1] : null;
-
-        const endTagIndex = str.indexOf("</strong>") + "</strong>".length;
-        const lesson_title = str.substring(endTagIndex).trim();
-
-        setTitle(lesson_title);
-      })
-      .catch((err) => console.log(err));
+  const handleSetting = () => {
+    navigate("/setting");
   };
 
   return (
@@ -178,20 +138,35 @@ export function Home() {
         {loading && <MyLoader isloading={loading} />}
         <div className="container mx-auto flex h-full w-full px-2 py-5">
           <div className="w-1/2 px-5">
-            <div className="flex items-center justify-center bg-[#bfbfbf] px-5 py-3">
-              <Typography variant="h3" className="mr-8 font-normal normal-case">
-                Lesson
-              </Typography>
-              <div className="flex w-1/2 cursor-pointer items-center justify-center rounded-lg">
-                <Select
-                  placeholder="Select a Lesson"
-                  optionFilterProp="children"
-                  onChange={handleSelectLesson}
-                  filterOption={filterOption}
-                  options={lessonlist}
-                  className="h-full w-full"
-                />
+            <div className="flex items-center justify-between bg-[#bfbfbf] px-5 py-3">
+              <div className="flex items-center">
+                <Typography
+                  variant="h3"
+                  className="mr-8 font-normal normal-case"
+                >
+                  Lesson
+                </Typography>
+                <div className="flex w-1/2 cursor-pointer items-center justify-center rounded-lg">
+                  <Select
+                    placeholder="Select a Lesson"
+                    optionFilterProp="children"
+                    onChange={handleSelectLesson}
+                    filterOption={filterOption}
+                    options={lessonlist.map((item, idx) => ({
+                      label: item.name,
+                      value: idx,
+                    }))}
+                    className="h-full w-full"
+                  />
+                </div>
               </div>
+              <Button
+                variant="outlined"
+                onClick={handleSetting}
+                className="border-black p-2"
+              >
+                <Avatar src="img/setting.svg" className="h-5 w-auto" />
+              </Button>
             </div>
             <div className="w-full bg-white p-5">
               <div

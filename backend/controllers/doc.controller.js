@@ -1,21 +1,29 @@
 const OpenAI = require("openai");
 require("dotenv").config();
+const db = require("../models");
+const Prompt = db.prompt;
+const Dataset = db.dataset;
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY, // This is the default and can be omitted
 });
 
 exports.summarize = async (req, res) => {
-  const { docText, title } = req.body;
-  console.log(title);
-  let msgs = [
-    {
-      role: "system",
-      content: `For the lesson titled ${title}, summarize the learning objectives in 2 short sentences`,
-    },
-    { role: "user", content: docText },
-  ];
+  const { lessonId } = req.body;
   try {
+    const prompt_row = await Prompt.findOne({
+      where: { name: "summarize" },
+    });
+    const lesson_row = await Dataset.findOne({
+      where: { lessonId: lessonId },
+    });
+    let msgs = [
+      {
+        role: "system",
+        content: `For the lesson titled ${lesson_row.title}, ${prompt_row.prompt}`,
+      },
+      { role: "user", content: lesson_row.content },
+    ];
     const completion = await openai.chat.completions.create({
       messages: msgs,
       model: "gpt-3.5-turbo",
@@ -24,22 +32,27 @@ exports.summarize = async (req, res) => {
       .status(200)
       .json({ data: completion.choices[0].message.content });
   } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ message: "Internal server error" });
+    console.log(err);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
 exports.contentStandard = async (req, res) => {
-  const { docText, title } = req.body;
-  console.log(title);
-  let msgs = [
-    {
-      role: "system",
-      content: `For the lesson titled ${title}, tell me specifically which content standards relate to reading or writing`,
-    },
-    { role: "user", content: docText },
-  ];
+  const { lessonId } = req.body;
   try {
+    const prompt_row = await Prompt.findOne({
+      where: { name: "standardContent" },
+    });
+    const lesson_row = await Dataset.findOne({
+      where: { lessonId: lessonId },
+    });
+    let msgs = [
+      {
+        role: "system",
+        content: `For the lesson titled ${lesson_row.title}, ${prompt_row.prompt}`,
+      },
+      { role: "user", content: lesson_row.content },
+    ];
     const completion = await openai.chat.completions.create({
       messages: msgs,
       model: "gpt-3.5-turbo",
@@ -54,16 +67,21 @@ exports.contentStandard = async (req, res) => {
 };
 
 exports.essentialQues = async (req, res) => {
-  const { docText, title } = req.body;
-  console.log(title);
-  let msgs = [
-    {
-      role: "system",
-      content: `For the lesson titled ${title}, re-write the essential questions at 3rd grade reading level`,
-    },
-    { role: "user", content: docText },
-  ];
+  const { lessonId } = req.body;
   try {
+    const prompt_row = await Prompt.findOne({
+      where: { name: "essentialQues" },
+    });
+    const lesson_row = await Dataset.findOne({
+      where: { lessonId: lessonId },
+    });
+    let msgs = [
+      {
+        role: "system",
+        content: `For the lesson titled ${lesson_row.title}, ${prompt_row.prompt}`,
+      },
+      { role: "user", content: lesson_row.content },
+    ];
     const completion = await openai.chat.completions.create({
       messages: msgs,
       model: "gpt-3.5-turbo",
@@ -78,16 +96,21 @@ exports.essentialQues = async (req, res) => {
 };
 
 exports.illustration = async (req, res) => {
-  const { docText, title } = req.body;
-  console.log(title);
-  let msgs = [
-    {
-      role: "system",
-      content: `For the lesson titled ${title}, please extract the summary key point from learner relevant and produce an illustration of it`,
-    },
-    { role: "user", content: docText },
-  ];
+  const { lessonId } = req.body;
   try {
+    const prompt_row = await Prompt.findOne({
+      where: { name: "illustration" },
+    });
+    const lesson_row = await Dataset.findOne({
+      where: { lessonId: lessonId },
+    });
+    let msgs = [
+      {
+        role: "system",
+        content: `For the lesson titled ${lesson_row.title}, ${prompt_row.prompt}`,
+      },
+      { role: "user", content: lesson_row.content },
+    ];
     const completion = await openai.chat.completions.create({
       messages: msgs,
       model: "gpt-3.5-turbo",
@@ -109,16 +132,21 @@ exports.illustration = async (req, res) => {
 };
 
 exports.quizQues = async (req, res) => {
-  const { docText, title } = req.body;
-  console.log(title);
-  let msgs = [
-    {
-      role: "system",
-      content: `For the lesson titled ${title}, expand the content in the formative assessment section into 10 quiz questions that I can use with my students. It should involve the current questions from the formative assessment section`,
-    },
-    { role: "user", content: docText },
-  ];
+  const { lessonId } = req.body;
   try {
+    const prompt_row = await Prompt.findOne({
+      where: { name: "quizQues" },
+    });
+    const lesson_row = await Dataset.findOne({
+      where: { lessonId: lessonId },
+    });
+    let msgs = [
+      {
+        role: "system",
+        content: `For the lesson titled ${lesson_row.title}, ${prompt_row.prompt}`,
+      },
+      { role: "user", content: lesson_row.content },
+    ];
     const completion = await openai.chat.completions.create({
       messages: msgs,
       model: "gpt-3.5-turbo",
